@@ -1,0 +1,9 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>MYPAGE</h2>
+    {%for info in userinfo %}
+    <li>NAME : {{info.username}}</li>
+    <li>E-mail : {{info.email}}</li>
+    {%endfor%}
+{% endblock %}
