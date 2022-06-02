@@ -30,9 +30,6 @@
                 <a class="nav-link" href="{% url 'category' %}">category</a>
             </li>
             {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>
                 <li class ="nav-item">
                     <a class="nav-link" href="{% url 'mylist' %}">MyList</a>
                 </li>
@@ -44,6 +41,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'newauctions' %}">NewAuctions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
 
             {% else %}
