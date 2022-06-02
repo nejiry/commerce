@@ -1,8 +1,11 @@
+from email import message
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from . import forms
+from datetime import timezone
 
 from .models import User,auctions,trade,coment
 
@@ -117,7 +120,25 @@ def management(request):#自分が行った投稿、コメントの履歴が見�
 
 
 def newauctions(request):
-    return render(request, "auctions/newauctions.html")
+    if request.method == "POST":
+        form = forms.AuctionForm(request)
+        if form.is_valid():
+            auctions.auction_title = request.POST['auction_title']
+            auctions.auction_price = request.POST['auction_price']
+            auctions.auction_content = request.POST['auction_content']
+            auctions.auction_limittime = request.POST['auction_limittime']
+            auctions.auction_picture = request.FILES['auction_picture']
+            auctions.auction_exhibitor = request.user
+            auctions.auction_daytime = timezone.now()
+            return render(request,"auctions/index.html",{
+                "message" : "complated"
+            })
+
+    else:    
+        form = forms.AuctionForm()
+        return render(request, "auctions/newauctions.html",{
+            'form':form
+        })
 
 def item(request):
     return render(request, "auctions/item.html")

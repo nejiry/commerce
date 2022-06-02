@@ -3,5 +3,11 @@
 {% block body %}
     <h2>newauctinos</h2>
 
-    TODO
+    <div class="auction">
+        <form method="POST">
+            {{form.as_p}}
+            {% csrf_token %}
+            <input type="submit" class="btn" value="submit">
+        </form>
+    </dev>
 {% endblock %}

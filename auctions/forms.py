@@ -4,21 +4,15 @@ from sre_constants import CATEGORY_LINEBREAK
 from turtle import title
 from django import forms
 
+from .models import auctions
 
-class Form(forms.Form):
-    title = forms.CharField(
-        max_length=100,
-    )
-    content= forms.CharField(
-        max_length=100,
-    )
-    picture= forms.CharField(
-        max_length=100,
-    )
-    category= forms.CharField(
-        max_length=100,
-    )
-    price= forms.IntegerField(
-        max_length=100,
-    )
-    limititime= forms.IntegerField()
+
+class AuctionForm(forms.ModelForm):
+    class Meta():
+        model = auctions
+        fields = (
+            'auction_title',
+            'auction_price',
+            'auction_content',
+            'auction_categoli',
+            'auction_picture')
