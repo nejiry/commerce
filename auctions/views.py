@@ -121,19 +121,19 @@ def management(request):#自分が行った投稿、コメントの履歴が見�
 
 def newauctions(request):
     if request.method == "POST":
-        form = forms.AuctionForm(request)
+        form = forms.AuctionForm(request.POST,request.FILES)
         if form.is_valid():
-            auctions.auction_title = request.POST['auction_title']
-            auctions.auction_price = request.POST['auction_price']
-            auctions.auction_content = request.POST['auction_content']
-            auctions.auction_limittime = request.POST['auction_limittime']
-            auctions.auction_picture = request.FILES['auction_picture']
-            auctions.auction_exhibitor = request.user
-            auctions.auction_daytime = timezone.now()
+            post = form.save(commit=False)
+            post.auction_exhibitor = request.user.username
+            post.auction_picture = form.cleaned_data['auction_picture']
+            post.save()
             return render(request,"auctions/index.html",{
-                "message" : "complated"
+                "message" : f"complated {auctions.auction_title}"
             })
-
+        else:
+            return render(request,"auctions/index.html",{
+                "messege" : "Failed"
+            })
     else:    
         form = forms.AuctionForm()
         return render(request, "auctions/newauctions.html",{

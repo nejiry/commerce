@@ -4,7 +4,7 @@
     <h2>newauctinos</h2>
 
     <div class="auction">
-        <form method="POST">
+        <form method="POST", enctype="multipart/form-data" >
             {{form.as_p}}
             {% csrf_token %}
             <input type="submit" class="btn" value="submit">

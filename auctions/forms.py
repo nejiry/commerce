@@ -15,4 +15,5 @@ class AuctionForm(forms.ModelForm):
             'auction_price',
             'auction_content',
             'auction_categoli',
-            'auction_picture')
+            'auction_picture',
+            'auction_limittime')

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import modelformset_factory
+from django.core import validators
 
 
 class User(AbstractUser):
@@ -14,21 +15,27 @@ class User(AbstractUser):
 
 class trade(models.Model):
     trade_price = models.IntegerField()
-    trade_daitime = models.DateTimeField(blank=True,null=True)
+    trade_daitime = models.DateTimeField(auto_now_add=True,null=True)
     trade_bidder = models.ForeignKey(User, on_delete=models.CASCADE)
     
 class coment(models.Model):
-    coment_daytime = models.DateTimeField(blank=True,null=True)
+    coment_daytime = models.DateTimeField(auto_now_add=True,null=True)
     coment_content = models.TextField()
     coment_user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class auctions(models.Model):
+    LIMIT = (
+        ('1','3Hours'),
+        ('2','12Hours'),
+        ('3','24Hours'),
+        ('4','3days'),
+    )
     auction_title = models.CharField(max_length=20,null=True)
-    auction_exhibitor = models.CharField(max_length=20,unique=True)
-    auction_price = models.IntegerField()
-    auction_daytime = models.DateTimeField(blank=True,null=True)
-    auction_limittime = models.DurationField()
-    auction_content = models.TextField()
+    auction_exhibitor = models.CharField(max_length=20,null=True)
+    auction_price = models.IntegerField(validators=[validators.MinValueValidator(0)],null=True)
+    auction_daytime = models.DateTimeField(auto_now_add=True,null=True)
+    auction_limittime = models.CharField(max_length=1,choices=LIMIT,null=True)
+    auction_content = models.TextField(null=True)
     auction_picture = models.ImageField(upload_to="image",blank=True,null=True)
-    auction_categoli = models.CharField(max_length=10)
+    auction_categoli = models.CharField(max_length=10, null=True)
