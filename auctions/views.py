@@ -4,14 +4,18 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from . import forms
-from datetime import timezone
-
+from . import forms,util
 from .models import User,auctions,trade,coment
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    entries = auctions.objects.filter(id=10)
+    limit = auctions.objects.get(id=10)
+     
+    return render(request, "auctions/index.html",{
+        "limittime" : util.limittime(limit),
+        "entries" : entries
+    })
 
 
 def login_view(request):
@@ -141,5 +145,10 @@ def newauctions(request):
         })
 
 def item(request):
-    return render(request, "auctions/item.html")
-
+    entries = auctions.objects.filter(id=10)
+    limit = auctions.objects.get(id=10)
+     
+    return render(request, "auctions/item.html",{
+        "limittime" : util.limittime(limit),
+        "entries" : entries
+    })

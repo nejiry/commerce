@@ -3,12 +3,14 @@
 {% block body %}
     <h2>ItemPages</h2>
 
-    title
-    picture
-    content
-    price
-    limittime
-    categoli
-    exhibitor
-    daytime
+    {% for ent in entries %}
+        {{ent.auction_title}}
+        <img src = "/media/{{ent.auction_picture}}">
+        {{ent.auction_content}}
+        {{ent.auction_price}}
+        {{limittime}}
+        {{ent.auction_categoli}}
+        {{ent.auction_exhibitor}}
+        {{ent.auction_daytime}}
+    {% endfor %}
 {% endblock %}
