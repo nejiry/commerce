@@ -4,7 +4,7 @@ from sre_constants import CATEGORY_LINEBREAK
 from turtle import title
 from django import forms
 
-from .models import auctions
+from .models import auctions , trade , coment
 
 
 class AuctionForm(forms.ModelForm):
@@ -17,3 +17,10 @@ class AuctionForm(forms.ModelForm):
             'auction_categoli',
             'auction_picture',
             'auction_limittime')
+
+class CommentForm(forms.ModelForm):
+    class Meta():
+        model = coment
+        fields = (
+            'coment_content',
+        )

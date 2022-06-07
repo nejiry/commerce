@@ -1,16 +1,23 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>ItemPages</h2>
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
 
-    {% for ent in entries %}
-        {{ent.auction_title}}
+        <h2> {{ent.auction_title}}</h2>
         <img src = "/media/{{ent.auction_picture}}">
-        {{ent.auction_content}}
-        {{ent.auction_price}}
-        {{limittime}}
-        {{ent.auction_categoli}}
-        {{ent.auction_exhibitor}}
-        {{ent.auction_daytime}}
-    {% endfor %}
+        <div> {{ent.auction_content}}</div>
+        <div> {{ent.auction_price}}</div>
+        <div> {{limittime}}</div>
+        <div> {{ent.auction_categoli}}</div>
+        <div> {{ent.auction_exhibitor}}</div>
+        <div> {{ent.auction_daytime}}</div>
+        {% if not message%}
+    <form method="POST" >
+        <input class="form-control" autofocus type="text" name="bit_price">
+        {% csrf_token %}
+        <input type="submit" class="btn" value="BID">
+    </form>
+    {% endif %}
 {% endblock %}

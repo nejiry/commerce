@@ -1,21 +1,25 @@
 from email import message
+from django import conf
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from . import forms,util
+from django.utils import timezone
 from .models import User,auctions,trade,coment
 
 
 def index(request):
-    entries = auctions.objects.filter(id=10)
-    limit = auctions.objects.get(id=10)
+    Query = auctions.objects.order_by('?')[:5]
+    Query = list(Query)
+    for entries in Query:
+        entries.auction_limittime = util.limittime(entries)
      
     return render(request, "auctions/index.html",{
-        "limittime" : util.limittime(limit),
-        "entries" : entries
+        "Query" : Query,
     })
+    
 
 
 def login_view(request):
@@ -109,9 +113,9 @@ def mylist(request):#お気に入りリスト
 
 def mypage(request):#アカウント情報、
     nowusername = request.user.username#ログイン中のユーザー名を取得
-    user_info = User.objects.filter(username=nowusername)
+    user_info = User.objects.get(username=nowusername)
     return render(request, "auctions/mypage.html",{
-        "userinfo" : user_info
+        "info" : user_info
     })
 
 
@@ -130,6 +134,7 @@ def newauctions(request):
             post = form.save(commit=False)
             post.auction_exhibitor = request.user.username
             post.auction_picture = form.cleaned_data['auction_picture']
+            post.auction_daytime = timezone.now()
             post.save()
             return render(request,"auctions/index.html",{
                 "message" : f"complated {auctions.auction_title}"
@@ -144,11 +149,37 @@ def newauctions(request):
             'form':form
         })
 
-def item(request):
-    entries = auctions.objects.filter(id=10)
-    limit = auctions.objects.get(id=10)
-     
-    return render(request, "auctions/item.html",{
-        "limittime" : util.limittime(limit),
-        "entries" : entries
-    })
+def item(request,id):
+    if request.method == "POST":
+        Bid_Price = request.POST["bid_price"]
+        auction = auctions.objects.get(id=id)
+        price = auction.auction_price
+        if price > Bid_Price:
+            return render(request,"auctions/item.html",id,{
+                "message" : "Amount is too low.",
+            })
+       
+        else:
+            trade_auction_ID = auction
+            trade_bidder = request.user.username
+            trade_price = Bid_Price
+            trade.objects.update_or_create(trade_price, trade_bidder, trade_auction_ID)
+            return render(request,"auctions/item.html",id,{
+                "message" : "complated",
+            })
+  
+    else:    
+        entries = auctions.objects.get(id=id)
+        limit = util.limittime(auctions.objects.get(id=id))
+        if int(limit.total_seconds()) < 0 :
+            return render(request, "auctions/item.html",{
+                "message" : "This auctision was Close",
+                "limittime" : limit,
+                "ent" : entries,
+            })
+        else:    
+            return render(request, "auctions/item.html",{
+                "limittime" : limit,
+                "ent" : entries,
+            })
+    

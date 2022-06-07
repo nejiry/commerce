@@ -14,14 +14,16 @@ class User(AbstractUser):
         return f"{self.username},{self.email}"
 
 class trade(models.Model):
-    trade_price = models.IntegerField()
-    trade_daitime = models.DateTimeField(auto_now_add=True,null=True)
-    trade_bidder = models.ForeignKey(User, on_delete=models.CASCADE)
+    trade_auction_ID = models.IntegerField(unique=True,null=True)
+    trade_price = models.IntegerField(validators=[validators.MinValueValidator(0)])
+    trade_daytime = models.DateTimeField(null=True)
+    trade_bidder = models.CharField(max_length=20,null=True)
+    trade_validity = models.BooleanField(default=True,)#購買履歴表示用
     
 class coment(models.Model):
-    coment_daytime = models.DateTimeField(auto_now_add=True,null=True)
+    coment_daytime = models.DateTimeField(null=True)
     coment_content = models.TextField()
-    coment_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    coment_user = models.CharField(max_length=20,null=True)
 
 
 class auctions(models.Model):
@@ -34,8 +36,9 @@ class auctions(models.Model):
     auction_title = models.CharField(max_length=20,null=True)
     auction_exhibitor = models.CharField(max_length=20,null=True)
     auction_price = models.IntegerField(validators=[validators.MinValueValidator(0)],null=True)
-    auction_daytime = models.DateTimeField(auto_now_add=True,null=True)
     auction_limittime = models.CharField(max_length=1,choices=LIMIT,null=True)
     auction_content = models.TextField(null=True)
-    auction_picture = models.ImageField(upload_to="image",blank=True,null=True)
+    auction_picture = models.ImageField(upload_to="image",blank=True,null=True,default="image/NoImage.jpeg")
     auction_categoli = models.CharField(max_length=10, null=True)
+    auction_validity = models.BooleanField(default=True,)#オークションが有効かどうか
+    auction_daytime = models.DateTimeField(null=True)

@@ -16,6 +16,6 @@ urlpatterns = [
     path("mypage/",views.mypage,name="mypage"),
     path("management/",views.management,name="management"),
     path("newauctions",views.newauctions,name="newauctions"),
-    path("item/",views.item,name="item")
+    path("item/<id>",views.item,name="item")
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

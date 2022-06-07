@@ -2,6 +2,25 @@
 
 {% block body %}
     <h2>SEARCHED</h2>
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+    <ol>
+    {% for ent in entries %}
+    <li class="small_entry" style="border:solid">
+        <h2 class="small_title" style="border:solid"><strong>{{ent.auction_title}}</strong></h2>
+        <img class="small_picture" src = "/media/{{ent.auction_picture}}"　width="200" height="145" style="border:solid">
+    <div class="small_context">
+        <div class="small_content">[CONTEXT] <p>{{ent.auction_content}}</p></div> 
+        <div class="small_limittime" style="border:solid">LIMIT {{limittime}}</div>
+    </div>
+        <div class="small_price" style="border:solid">PRICE : {{ent.auction_price}}</div>
+        <div class="small_categoli" style="border:solid">CATEGOLI :  {{ent.auction_categoli}}</div>
+        <div class="small_exhibitor" style="border:solid">WHO : {{ent.auction_exhibitor}}</div>
+        <div class="small_daytime" style="border:solid">CREATED {{ent.auction_daytime}}</div>
+    </li>
+    {% endfor %}
+    </ol>
 
     TODO
 {% endblock %}
