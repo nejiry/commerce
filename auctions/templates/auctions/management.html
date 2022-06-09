@@ -2,6 +2,28 @@
 
 {% block body %}
     <h2>MANAGEMENT</h2>
+    <h3>Trade Log</h3>
+    {% for trade in trades%}
+    {%if trade.trade_validity != True %}
+    <div><strong>CLOSE AUCTION</strong></div>
+    {% else %}
+    <div><strong>ACTIVE AUCTION</strong></div>
+    {% endif %}
+    <a href="{% url 'item' trade.trade_auction_ID %}">
+        <div>auction ID : {{trade.trade_auction_ID}}</div>
+    </a>
+        <div>Bid price : {{trade.trade_price}}</div>
+        <div>When your Trade : {{trade.trade_daytime}}</div>
+        <p></p>
+    {% endfor %}
 
-    TODO
+    <h3>Comment Log</h3>
+    {%for com in comment %}
+    <a href="{% url 'item' com.coment_auction_ID %}">
+    <li> Your comment
+    <div> {{com.coment_content}}</div>
+    <div>auther.{{com.coment_user}} : {{com.coment_daytime}} : {{com.id}}</div></li></a>
+    {% endfor %}
+
+    
 {% endblock %}

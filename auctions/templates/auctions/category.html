@@ -2,6 +2,10 @@
 
 {% block body %}
     <h2>CATEGORY</h2>
+    {% for cat in category%}
+    <a href="{% url 'search2' cat.auction_categoli %}">
+    <li> {{cat.auction_categoli}} ( {{cat.count}} )</li>
+    </a>
+    {% endfor %}
 
-    TODO
 {% endblock %}

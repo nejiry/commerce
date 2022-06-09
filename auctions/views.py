@@ -11,14 +11,34 @@ from .models import User,auctions,trade,coment
 
 
 def index(request):
-    Query = auctions.objects.order_by('?')[:5]
+    entries=auctions.objects.all()
+    for entry in entries:
+        limit = util.limittime(entry)
+        if int(limit.total_seconds()) < 0 :
+            entry.auction_validity = False
+            entry.save()
+    Query = auctions.objects.filter(auction_validity = True).order_by('?')[:5]
     Query = list(Query)
     for entries in Query:
         entries.auction_limittime = util.limittime(entries)
      
     return render(request, "auctions/index.html",{
         "Query" : Query,
+        "message" : "5 Active Auctions"
     })
+
+def all_view(request):
+    Query = auctions.objects.order_by('?')[:10]
+    Query = list(Query)
+    for entries in Query:
+        entries.auction_limittime = util.limittime(entries)
+     
+    return render(request, "auctions/index.html",{
+        "Query" : Query,
+        "message" : "10 Random Auctions"
+
+    })
+
     
 
 
@@ -75,36 +95,38 @@ def register(request):
 
 
 def category(request):
-    return render(request, "auctions/category.html")
+    lists = []
+    category_list = auctions.objects.distinct().values('auction_categoli')
+    for category in category_list :
+        cat = category['auction_categoli']
+        counts = auctions.objects.filter(auction_categoli = cat).count()
+        count = {'count': counts} 
+        category = category | count
+        lists.append(category)
+    return render(request, "auctions/category.html",{
+        "category" : lists,
+        })
 
 
-def search(request):
-    ENT = []
+def search(request,):
     if request.method == "POST":
-        if request.POST["searchword"] is not None:
-            TITLE = request.POST["searchword"]
-            entries = auctions.objects.all().values("auction_title") 
-            ENT.clear()
-            for entry in entries:
-                if entry in TITLE:
-                    ENT.append(entry)
-                    return render(request, "auctions/searched.html",{
-                       "entries" : ENT
-                   })
-                           
-            if not ENT:
-             return render(request, "auctions/Error.html",{
-                    "messege": (TITLE) + " SEARCHED BUT NOT IN ITEMS"} )
-        
-        else:
-            return render(request,"auctions/Error.html",{
-                "messege" : "ERROR this is GET request"
-            })   
-    
-    else:
-        return render(request,"auctions/Error.html",{
-            "messege" : "ERROR this is GET request"
-        })  
+        word = request.POST["searchword"]
+        result = auctions.objects.filter(auction_title__contains = word)
+        for entries in result:
+            entries.auction_limittime = util.limittime(entries)
+        return render(request, "auctions/index.html",{
+            "Query" : result,
+            "message" : f"[{word}] Searched" 
+    })
+
+def search2(request,word):
+        result = auctions.objects.filter(auction_categoli = word).order_by('auction_validity').reverse()
+        for entries in result:
+            entries.auction_limittime = util.limittime(entries)
+        return render(request, "auctions/index.html",{
+            "Query" : result,
+            "message":"From Category"
+    })
 
 
 def mylist(request):#お気に入りリスト
@@ -124,7 +146,21 @@ def error(request):#エラー出力
 
 
 def management(request):#自分が行った投稿、コメントの履歴が見れる
-    return render(request, "auctions/management.html")
+    trade_log = trade.objects.filter(trade_bidder = request.user.username)
+    for log in trade_log:
+        entry = auctions.objects.get(id = log.trade_auction_ID)
+        limit = util.limittime(entry)
+        if int(limit.total_seconds()) < 0 :
+            log.auction_validity = False
+            log.trade_validity = False
+    
+    
+    comment_log = coment.objects.filter(coment_user = request.user.username)
+
+    return render(request, "auctions/management.html",{
+            "trades" : trade_log,
+            "comment" : comment_log
+    })
 
 
 def newauctions(request):
@@ -150,36 +186,65 @@ def newauctions(request):
         })
 
 def item(request,id):
+    entries = auctions.objects.get(id=id)
+    limit = util.limittime(entries)
+    com_list = coment.objects.filter(coment_auction_ID = id)
     if request.method == "POST":
-        Bid_Price = request.POST["bid_price"]
-        auction = auctions.objects.get(id=id)
-        price = auction.auction_price
-        if price > Bid_Price:
-            return render(request,"auctions/item.html",id,{
-                "message" : "Amount is too low.",
-            })
-       
+        if 'bid' in request.POST:
+            Bid_Price = int(request.POST["bid_price"])
+            price = entries.auction_price
+            if price > Bid_Price:
+                return render(request,"auctions/item.html",{
+                    "message" : "Amount is too low.",
+                    "limittime" : limit,
+                    "ent" : entries,
+                    "lists" : com_list
+                })
+            else:
+                trade.objects.update_or_create(
+                trade_auction_ID = id,
+                defaults = {
+                    "trade_bidder" : request.user.username,
+                    "trade_price" : Bid_Price,
+                    "trade_daytime" : timezone.now()
+                })            
+                entries.auction_price = Bid_Price
+                entries.save()
+
+                return render(request,"auctions/item.html",{
+                    "message" : "complated",
+                    "limittime" : limit,
+                    "ent" : entries,
+                    "lists" : com_list
+                })
         else:
-            trade_auction_ID = auction
-            trade_bidder = request.user.username
-            trade_price = Bid_Price
-            trade.objects.update_or_create(trade_price, trade_bidder, trade_auction_ID)
-            return render(request,"auctions/item.html",id,{
-                "message" : "complated",
-            })
+            comment = request.POST["comment"]
+            coment.objects.create(
+                coment_auction_ID = id,
+                coment_user = request.user.username,
+                coment_content = comment,
+                coment_daytime = timezone.now()
+            )
+            return render(request,"auctions/item.html",{
+                    "message" : comment,
+                    "limittime" : limit,
+                    "ent" : entries,
+                    "lists" : com_list,
+                })
   
     else:    
-        entries = auctions.objects.get(id=id)
-        limit = util.limittime(auctions.objects.get(id=id))
         if int(limit.total_seconds()) < 0 :
             return render(request, "auctions/item.html",{
-                "message" : "This auctision was Close",
+                "message" : "This Auction Has Closed",
+                "close_form": "a",
                 "limittime" : limit,
                 "ent" : entries,
+                "lists" : com_list
             })
-        else:    
+        else:
             return render(request, "auctions/item.html",{
                 "limittime" : limit,
                 "ent" : entries,
+                "lists" : com_list
             })
-    
+

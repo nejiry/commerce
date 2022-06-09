@@ -1,3 +1,4 @@
+from nis import cat
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import modelformset_factory
@@ -24,6 +25,8 @@ class coment(models.Model):
     coment_daytime = models.DateTimeField(null=True)
     coment_content = models.TextField()
     coment_user = models.CharField(max_length=20,null=True)
+    coment_auction_ID=models.IntegerField(null=True)
+
 
 
 class auctions(models.Model):
@@ -33,6 +36,7 @@ class auctions(models.Model):
         ('3','24Hours'),
         ('4','3days'),
     )
+
     auction_title = models.CharField(max_length=20,null=True)
     auction_exhibitor = models.CharField(max_length=20,null=True)
     auction_price = models.IntegerField(validators=[validators.MinValueValidator(0)],null=True)

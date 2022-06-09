@@ -25,3 +25,7 @@ def limittime (limit):
         durations = "NULL"
     
     return durations
+
+def get_comment(id):
+    lists = coment.objects.filter(coment_auction_ID = id)
+    return lists

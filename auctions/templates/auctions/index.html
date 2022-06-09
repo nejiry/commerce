@@ -1,12 +1,15 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %} 
-    <h2>Ramdom Auctions</h2>
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
+    <h2>{{ message }}</h2>
     <ol>
     {% for ent in Query %}
+    {%if ent.auction_validity != True %}
+    <div><strong>CLOSE AUCTION</strong></div>
+    {% else %}
+    <div><strong>ACTIVE AUCTION</strong></div>
+    {% endif %}
+
     <a href="{% url 'item' ent.id %}">
     <li class="small_entry" style="border:solid">
         <h2 class="small_title" style="border:solid"><strong>{{ent.auction_title}}</strong></h2>

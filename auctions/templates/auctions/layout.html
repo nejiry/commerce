@@ -8,7 +8,7 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <h1><a class="nav-link" href="{% url 'index' %}">Auctions</a></h1>
+        <h1><a class="nav-link" href="{% url 'all_view' %}">Auctions</a></h1>
         <div>
             {% if user.is_authenticated %}
                 Signed in as <strong>{{ user.username }}</strong>.
@@ -18,13 +18,13 @@
         </div>
         
         <ul class="nav">
-            <form action="{% url 'search'%}" method="post">
+            <form action="{% url 'search' %}" method="POST">
                 {% csrf_token %}
                 <input type="text" name="searchword">
                 <input type="submit" value="SEARCH">
             </form>    
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <a class="nav-link" href="{% url 'index' %}">Active Auctions</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'category' %}">category</a>

@@ -13,11 +13,24 @@
         <div> {{ent.auction_categoli}}</div>
         <div> {{ent.auction_exhibitor}}</div>
         <div> {{ent.auction_daytime}}</div>
-        {% if not message%}
-    <form method="POST" >
-        <input class="form-control" autofocus type="text" name="bit_price">
+   
+    {% if not close_form %}
+    <form method="POST" name="bid" >
+        <input class="form-control" autofocus type="number" name="bid_price" >
         {% csrf_token %}
-        <input type="submit" class="btn" value="BID">
+        <input type="submit" class="btn" value="BID" name="bid">
+    </form>
+
+    <div>COMMENT</div>
+        {% for com in lists %}
+        <li>{{com.coment_content}}
+        <div>auther.{{com.coment_user}} : {{com.coment_daytime}} :commentID:{{com.id}}</div></li>
+        {% endfor %}
+
+    <form method="POST" name="comment" >
+        <input class="form-control" type="textbox" name="comment" >
+        {% csrf_token %}
+        <input type="submit" class="btn" value="post" name="comment_bt">
     </form>
     {% endif %}
 {% endblock %}
